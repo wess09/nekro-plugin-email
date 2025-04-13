@@ -1,1 +1,1 @@
-# nekro-plugin-email
+# Nekro—Plugin-Email
