@@ -1,8 +1,8 @@
 [tool.poetry]
-name = "nekro—plugin-email"
-version = "1.0.0"
-description = "nekro—plugin-email"
-authors = ["KroMiose <li_xiangff@163.com>"]
+name = "nekro-plugin-email"
+version = "0.1.0"
+description = "给与 AI 发送邮件的能力"
+authors = ["wess09"]
 readme = "README.md"
 packages = []
 repository = "https://github.com/KroMiose/nekro-agent"
