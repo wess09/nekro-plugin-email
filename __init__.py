@@ -1,6 +1,9 @@
-from typing import Dict
-
-import httpx
+from email.message import EmailMessage
+import smtplib
+from email.mime.base import MIMEBase
+from email import encoders
+from pathlib import Path
+from nekro_agent.tools.path_convertor import convert_to_host_path
 from nekro_agent.api.schemas import AgentCtx
 from nekro_agent.core import logger
 from nekro_agent.services.plugin.base import ConfigBase, NekroPlugin, SandboxMethodType
@@ -67,20 +70,16 @@ async def send_email(_ctx: AgentCtx, to_addr: str, subject: str, body: str, file
         to_addr: 收件人邮箱地址
         subject: 邮件主题
         body: 邮件正文内容
+        files: 附件路径列表，可选。支持本地文件路径格式（如：'data/report.pdf'）
 
     Returns:
-        str: 发送成功返回'success'，失败返回错误信息
+        str: 发送成功返回'success'，失败返回错误信息。包含附件时会验证文件大小限制（最大{config.MAX_ATTACHMENT_SIZE}MB）
 
     Example:
         发送测试邮件:
-        send_email(to_addr="recipient@example.com", subject="测试邮件", body="这是一封测试邮件")
+        send_email(to_addr="recipient@example.com", subject="测试邮件", body="这是一封测试邮件", files=["data/report.pdf"])
     """
-    from email.message import EmailMessage
-    import smtplib
-    from email.mime.base import MIMEBase
-    from email import encoders
-    from pathlib import Path
-    from nekro_agent.tools.path_convertor import convert_to_host_path
+
 
     msg = EmailMessage()
     msg['From'] = config.USERNAME
