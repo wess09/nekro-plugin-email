@@ -10,7 +10,7 @@ plugin = NekroPlugin(
     name="电子邮件",  # TODO: 插件名称
     module_name="nekro_plugin_email",  # TODO: 插件模块名 (如果要发布该插件，需要在 NekroAI 社区中唯一)
     description="给与 AI 发送邮件的能力",  # TODO: 插件描述
-    version="0.1.0",  # TODO: 插件版本
+    version="0.1.4",  # TODO: 插件版本
     author="wess09",  # TODO: 插件作者
     url="https://github.com/wess09/nekro-plugin-email",  # TODO: 插件仓库地址
 )
