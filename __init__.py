@@ -1,9 +1,6 @@
-from email.message import EmailMessage
-import smtplib
-from email.mime.base import MIMEBase
-from email import encoders
-from pathlib import Path
-from nekro_agent.tools.path_convertor import convert_to_host_path
+from typing import Dict
+
+import httpx
 from nekro_agent.api.schemas import AgentCtx
 from nekro_agent.core import logger
 from nekro_agent.services.plugin.base import ConfigBase, NekroPlugin, SandboxMethodType
@@ -50,12 +47,6 @@ class EmailConfig(ConfigBase):
         title="启用TLS",
         description="是否使用TLS安全连接",
     )
-    MAX_ATTACHMENT_SIZE: int = Field(
-        default=50,
-        title="最大附件大小(MB)",
-        description="单个附件的最大允许大小",
-        gt=0,
-    )
 
 
 # 获取配置实例
@@ -63,40 +54,29 @@ config: EmailConfig = plugin.get_config(EmailConfig)
 
 
 @plugin.mount_sandbox_method(SandboxMethodType.AGENT, name="发送邮件", description="通过SMTP协议发送电子邮件")
-async def send_email(_ctx: AgentCtx, to_addr: str, subject: str, body: str, files: list[str] | None = None) -> str:
+async def send_email(_ctx: AgentCtx, to_addr: str, subject: str, body: str) -> str:
     """发送电子邮件到指定地址。
 
     Args:
         to_addr: 收件人邮箱地址
         subject: 邮件主题
         body: 邮件正文内容
-        files: 附件路径列表，可选。支持本地文件路径格式（如：'data/report.pdf'）
 
     Returns:
-        str: 发送成功返回'success'，失败返回错误信息。包含附件时会验证文件大小限制（最大{config.MAX_ATTACHMENT_SIZE}MB）
+        str: 发送成功返回'success'，失败返回错误信息
 
     Example:
         发送测试邮件:
-        send_email(to_addr="recipient@example.com", subject="测试邮件", body="这是一封测试邮件", files=["data/report.pdf"])
+        send_email(to_addr="recipient@example.com", subject="测试邮件", body="这是一封测试邮件")
     """
-
+    from email.message import EmailMessage
+    import smtplib
 
     msg = EmailMessage()
     msg['From'] = config.USERNAME
     msg['To'] = to_addr
     msg['Subject'] = subject
     msg.set_content(body)
-
-    if files:
-        for file_path in files:
-            host_path = convert_to_host_path(Path(file_path), _ctx.chat_key)
-            with open(host_path, "rb") as fp:
-                file_data = fp.read()
-            mime = MIMEBase("application", "octet-stream")
-            mime.set_payload(file_data)
-            encoders.encode_base64(mime)
-            mime.add_header("Content-Disposition", f"attachment; filename={Path(file_path).name}")
-            msg.add_attachment(mime)
 
     try:
         with smtplib.SMTP(config.SMTP_SERVER, config.SMTP_PORT) as server:
