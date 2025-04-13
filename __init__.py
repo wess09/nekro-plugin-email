@@ -1,6 +1,5 @@
-from typing import Dict
-
-import httpx
+from email.message import EmailMessage
+import smtplib
 from nekro_agent.api.schemas import AgentCtx
 from nekro_agent.core import logger
 from nekro_agent.services.plugin.base import ConfigBase, NekroPlugin, SandboxMethodType
@@ -69,8 +68,6 @@ async def send_email(_ctx: AgentCtx, to_addr: str, subject: str, body: str) -> s
         发送测试邮件:
         send_email(to_addr="recipient@example.com", subject="测试邮件", body="这是一封测试邮件")
     """
-    from email.message import EmailMessage
-    import smtplib
 
     msg = EmailMessage()
     msg['From'] = config.USERNAME
