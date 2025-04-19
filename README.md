@@ -1,4 +1,4 @@
-# Nekro—Plugin-Email
+# Nekro-Plugin-Email
 ## NA电子邮件插件
 ### 简介
 Nekro Agent Plugin——NA电子邮件插件，用于发送邮件。
